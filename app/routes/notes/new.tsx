@@ -20,6 +20,13 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ errors: { body: "Body is required" } }, { status: 400 });
   }
 
+  if (typeof category !== "string" || category.length === 0) {
+    return json(
+      { errors: { category: "Category is required" } },
+      { status: 400 }
+    );
+  }
+
   const note = await createNote({ title, body, category, userId });
   return redirect(`/notes/${note.id}`);
 };
