@@ -10,6 +10,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const title = formData.get("title");
   const body = formData.get("body");
+  const category = formData.get("category");
 
   if (typeof title !== "string" || title.length === 0) {
     return json({ errors: { title: "Title is required" } }, { status: 400 });
@@ -19,7 +20,14 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ errors: { body: "Body is required" } }, { status: 400 });
   }
 
-  const note = await createNote({ title, body, userId });
+  if (typeof category !== "string" || category.length === 0) {
+    return json(
+      { errors: { category: "Category is required" } },
+      { status: 400 }
+    );
+  }
+
+  const note = await createNote({ title, body, category, userId });
   return redirect(`/notes/${note.id}`);
 };
 
@@ -51,6 +59,18 @@ export default function NewNotePage() {
             rows={8}
             className="w-full flex-1 rounded-md border-2 border-blue-500 py-2 px-3 text-lg leading-6"
           ></textarea>
+        </label>
+      </div>
+
+      <div>
+        <label className="flex w-full flex-col gap-1">
+          <span>Category: </span>
+          <input
+            type="text"
+            name="category"
+            id="category"
+            className="flex-1 rounded-md border-2 border-blue-500 px-3 text-lg leading-loose"
+          />
         </label>
       </div>
 
