@@ -1,9 +1,28 @@
 import { Link } from "@remix-run/react";
 import { useOptionalUser } from "~/utils";
 import Layout from "../components/Layout";
+import type { Note } from "~/models/note.server";
+import { LoaderArgs } from "@remix-run/node";
+import { getAllNoteListItems } from "~/models/note.server";
+import { useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
+
+type LoaderData = {
+  noteListItems: Note[];
+};
+
+export async function loader({ request }: LoaderArgs) {
+  const noteListItems = await getAllNoteListItems();
+  return json({ noteListItems });
+}
 
 export default function Index() {
+  const data = useLoaderData<typeof loader>() as LoaderData;
+
   const user = useOptionalUser();
+
+  console.log(data);
+
   return (
     <Layout>
       <h2>Homepage</h2>
@@ -30,6 +49,11 @@ export default function Index() {
           </Link>
         </div>
       )}
+      <ul>
+        {data.noteListItems.map((item) => {
+          return <li key={item.id}>{item.title}</li>;
+        })}
+      </ul>
     </Layout>
   );
 }
